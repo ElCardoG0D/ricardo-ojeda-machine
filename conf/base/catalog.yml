@@ -1,0 +1,21 @@
+# Here you can define all your datasets by using simple YAML syntax.
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+
+intakes:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/Austin_Animal_Center_Intakes__10_01_2013_to_05_05_2025_.csv
+  load_args:
+    encoding: utf-8
+
+outcomes:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/Austin_Animal_Center_Outcomes__10_01_2013_to_05_05_2025_.csv
+  load_args:
+    encoding: utf-8
+
+licenses:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/Seattle_Pet_Licenses.csv
+  load_args:
+    encoding: utf-8

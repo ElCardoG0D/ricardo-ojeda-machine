@@ -1,0 +1,1 @@
+{"intakes": {"rows": 173812, "columns": 12, "file_size": 26000261}, "intakes_clean": {"rows": 173776, "columns": 12}, "outcomes": {"rows": 173775, "columns": 12, "file_size": 21338783}, "outcomes_clean": {"rows": 173775, "columns": 12}, "licenses": {"rows": 42659, "columns": 7, "file_size": 2815488}, "intakes_outcomes_merged": {"rows": 221159, "columns": 23}}
