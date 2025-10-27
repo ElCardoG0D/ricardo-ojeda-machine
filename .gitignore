@@ -1,4 +1,11 @@
-data/
+# Ignorar todos los datos por defecto
+data/*
+
+# Pero permitir los .dvc de seguimiento
+!data/*.dvc
+!data/**/.gitignore
+!data/.gitignore
+
 conf/local/
 *.log
 .ipynb_checkpoints/
