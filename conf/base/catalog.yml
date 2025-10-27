@@ -19,3 +19,48 @@ licenses:
   filepath: data/01_raw/Seattle_Pet_Licenses.csv
   load_args:
     encoding: utf-8
+    
+features_dataset:
+  type: pandas.CSVDataset
+  filepath: data/04_feature/features_dataset.csv
+
+resultados_regresion:
+  type: MemoryDataset
+
+X_train:
+  type: MemoryDataset
+X_test:
+  type: MemoryDataset
+y_train:
+  type: MemoryDataset
+y_test:
+  type: MemoryDataset
+regression_results:
+  type: MemoryDataset
+
+# Salidas intermedias clasificación
+X_train_clf:
+  type: MemoryDataset
+X_test_clf:
+  type: MemoryDataset
+y_train_clf:
+  type: MemoryDataset
+y_test_clf:
+  type: MemoryDataset
+
+# Resultados clasificación
+resultados_clasificacion:
+  type: pandas.CSVDataSet
+  filepath: data/08_reporting/resultados_clasificacion.csv
+  save_args:
+    index: false
+
+# Artefactos (dict con rutas/metadata)
+artefactos_clf:
+  type: MemoryDataset
+
+intakes_outcomes_merged:
+  type: MemoryDataset
+
+
+

@@ -1,0 +1,26 @@
+stages:
+  data_preparation:
+    cmd: python -m kedro run --pipeline=data_preparation
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/data_preparation
+      - data/01_raw
+    outs:
+      - data/07_model_input
+
+  regression:
+    cmd: python -m kedro run --pipeline=regression
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/regression
+      - data/07_model_input
+    outs:
+      - data/08_reporting/resultados_regresion.csv
+      - data/08_reporting/comparativa_modelos_R2.png
+
+  classification:
+    cmd: python -m kedro run --pipeline=classification
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/classification
+      - data/07_model_input
+    outs:
+      - data/08_reporting/resultados_clasificacion.csv
+      - data/08_reporting/comparativa_modelos_clf.png
