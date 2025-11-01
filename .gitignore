@@ -1,15 +1,55 @@
+# ============================================================
+# 🧠 GITIGNORE - Proyecto Kedro + Airflow + Docker + DVC
+# ============================================================
+
 # Ignorar todos los datos por defecto
 data/*
-
-# Pero permitir los .dvc de seguimiento
+# Permitir los archivos de seguimiento DVC
 !data/*.dvc
 !data/**/.gitignore
 !data/.gitignore
 
-conf/local/
+# ============================================================
+# 🔒 Entornos virtuales y dependencias
+# ============================================================
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# ============================================================
+# ⚙️ Archivos temporales y de caché
+# ============================================================
 *.log
-.ipynb_checkpoints/
-__pycache__/
 *.pyc
+*.pyo
+*.pyd
+__pycache__/
 .pytest_cache/
+.ipynb_checkpoints/
+
+# ============================================================
+# 📦 Archivos de configuración local y build
+# ============================================================
+conf/local/
 docs/build/
+build/
+dist/
+.cache/
+.DS_Store
+*.egg-info/
+
+# ============================================================
+# 🐳 Docker y Airflow
+# ============================================================
+airflow/logs/
+airflow/plugins/__pycache__/
+airflow/__pycache__/
+*.pid
+
+# ============================================================
+# 🔁 DVC y outputs generados
+# ============================================================
+.dvc/cache/
+.dvc/tmp/
