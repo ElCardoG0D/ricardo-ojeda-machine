@@ -1,0 +1,65 @@
+schema: '2.0'
+stages:
+  data_preparation:
+    cmd: python -m kedro run --pipeline=data_preparation
+    deps:
+    - path: data/01_raw
+      hash: md5
+      md5: 91b1bfc645cb6c6d563cd1c155493513.dir
+      size: 50154532
+      nfiles: 4
+    - path: src/ricardo_ojeda_machine/pipelines/data_preparation
+      hash: md5
+      md5: f3f54577b86044a5e86990d7b29b4706.dir
+      size: 6520
+      nfiles: 7
+    outs:
+    - path: data/07_model_input
+      hash: md5
+      md5: aa51ccec12eaf447aa0a1e0139557c08.dir
+      size: 54708395
+      nfiles: 1
+  regression:
+    cmd: python -m kedro run --pipeline=regression
+    deps:
+    - path: data/07_model_input
+      hash: md5
+      md5: aa51ccec12eaf447aa0a1e0139557c08.dir
+      size: 54708395
+      nfiles: 1
+    - path: src/ricardo_ojeda_machine/pipelines/regression
+      hash: md5
+      md5: b17a635f1b1ab5c02ec1216ab49f0dba.dir
+      size: 14981
+      nfiles: 6
+    outs:
+    - path: data/08_reporting/comparativa_modelos_R2.png
+      hash: md5
+      md5: 2a035652c80ece3db12494e70cdc36b2
+      size: 31506
+    - path: data/08_reporting/resultados_regresion.csv
+      hash: md5
+      md5: e72a462ed4b4b5d890debec1d6c62d2e
+      size: 166
+  classification:
+    cmd: python -m kedro run --pipeline=classification
+    deps:
+    - path: data/07_model_input
+      hash: md5
+      md5: aa51ccec12eaf447aa0a1e0139557c08.dir
+      size: 54708395
+      nfiles: 1
+    - path: src/ricardo_ojeda_machine/pipelines/classification
+      hash: md5
+      md5: e1ed063dc8bd1ab5e25b4c0e38b2510a.dir
+      size: 18066
+      nfiles: 6
+    outs:
+    - path: data/08_reporting/comparativa_modelos_clf.png
+      hash: md5
+      md5: 297ef86bc22cddf4a79268eb4b76ba0d
+      size: 22343
+    - path: data/08_reporting/resultados_clasificacion.csv
+      hash: md5
+      md5: 6dbf2951430d98a167d34caa2c2d1354
+      size: 176

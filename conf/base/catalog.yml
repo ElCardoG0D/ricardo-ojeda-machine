@@ -60,7 +60,13 @@ artefactos_clf:
   type: MemoryDataset
 
 intakes_outcomes_merged:
-  type: MemoryDataset
+  type: pandas.CSVDataset
+  filepath: data/07_model_input/intakes_outcomes_merged.csv
+  save_args:
+    index: False
+
+
+
 
 
 
