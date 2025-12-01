@@ -1,6 +1,11 @@
 # ============================================================
 # 🌀 DAG: ricardo_ml_dag.py
-# Orquesta los pipelines de Kedro (regresión + clasificación)
+# Orquesta los pipelines de Kedro:
+# - data_engineering
+# - data_preparation
+# - regression
+# - classification
+# - unsupervised (clustering)
 # ============================================================
 
 from datetime import datetime, timedelta
@@ -8,7 +13,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 # ============================================================
-# 1️⃣ Configuración general del DAG
+# 1️⃣ CONFIGURACIÓN GENERAL
 # ============================================================
 default_args = {
     "owner": "Ricardo Ojeda",
@@ -23,51 +28,74 @@ default_args = {
 dag = DAG(
     dag_id="ricardo_ml_dag",
     default_args=default_args,
-    description="Orquestación de pipelines Kedro para Regresión y Clasificación",
-    schedule_interval=None,  # Ejecución manual
-    start_date=datetime(2025, 10, 27),
+    description=(
+        "Orquestación completa de pipelines Kedro: "
+        "data_engineering, data_preparation, regression, classification y unsupervised"
+    ),
+    schedule_interval=None,    # ejecución manual
+    start_date=datetime(2025, 11, 28),  # evita backfill
     catchup=False,
-    tags=["kedro", "machine_learning", "ricardo_ojeda_machine"],
+    tags=["kedro", "ml_project", "Ricardo"],
 )
 
 # ============================================================
-# 2️⃣ Tareas del pipeline
+# 2️⃣ TAREAS DEL PIPELINE (AIRFLOW → KEDRO)
 # ============================================================
 
-# --- 1️⃣ Ejecución del pipeline de preparación de datos ---
+# --- 0️⃣ DATA ENGINEERING (validación datasets crudos) ---
+data_engineering_task = BashOperator(
+    task_id="data_engineering_pipeline",
+    bash_command="cd /opt/airflow/project && kedro run --pipeline=data_engineering",
+    dag=dag,
+)
+
+# --- 1️⃣ DATA PREPARATION (limpieza + merge) ---
 prepare_task = BashOperator(
     task_id="data_preparation",
     bash_command="cd /opt/airflow/project && kedro run --pipeline=data_preparation",
     dag=dag,
 )
 
-# --- 2️⃣ Ejecución del pipeline de regresión ---
+# --- 2️⃣ REGRESIÓN ---
 regression_task = BashOperator(
     task_id="regression_pipeline",
     bash_command="cd /opt/airflow/project && kedro run --pipeline=regression",
     dag=dag,
 )
 
-# --- 3️⃣ Ejecución del pipeline de clasificación ---
+# --- 3️⃣ CLASIFICACIÓN ---
 classification_task = BashOperator(
     task_id="classification_pipeline",
     bash_command="cd /opt/airflow/project && kedro run --pipeline=classification",
     dag=dag,
 )
 
-# ============================================================
-# 🚫 DVC Push (desactivado para entrega)
-# ============================================================
-# Si deseas activarlo más adelante, quita los comentarios
-# y asegúrate de tener un remote configurado en DVC.
-# dvc_push_task = BashOperator(
-#     task_id="dvc_push",
-#     bash_command="cd /opt/airflow/project && dvc push",
+# --- 4️⃣ NO SUPERVISADO / CLUSTERING ---
+unsupervised_task = BashOperator(
+    task_id="unsupervised_pipeline",
+    bash_command="cd /opt/airflow/project && kedro run --pipeline=unsupervised",
+    dag=dag,
+)
+
+# (Opcional) --- 5️⃣ REPORTING GLOBAL ---
+# Si algún día tienes un pipeline `reporting`, lo agregas aquí:
+# reporting_task = BashOperator(
+#     task_id="reporting_pipeline",
+#     bash_command="cd /opt/airflow/project && kedro run --pipeline=reporting",
 #     dag=dag,
 # )
 
 # ============================================================
-# 3️⃣ Dependencias del flujo
+# 3️⃣ DEPENDENCIAS ENTRE TAREAS
 # ============================================================
-# prepare_task >> [regression_task, classification_task] >> dvc_push_task
-prepare_task >> [regression_task, classification_task]
+
+# Primero validar datasets crudos
+data_engineering_task >> prepare_task
+
+# Luego de preparar el dataset unificado, puedes lanzar:
+# - modelos supervisados (regresión y clasificación)
+# - análisis no supervisado (clustering + PCA + t-SNE)
+prepare_task >> [regression_task, classification_task, unsupervised_task]
+
+# Si tuvieras reporting global:
+# [regression_task, classification_task, unsupervised_task] >> reporting_task

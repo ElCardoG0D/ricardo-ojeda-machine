@@ -1,93 +1,70 @@
 # ============================================================
-# 🐍 BASE IMAGE
+# BASE OFICIAL DE APACHE AIRFLOW
 # ============================================================
-FROM python:3.10-slim
+FROM apache/airflow:2.7.2-python3.10
 
 # ============================================================
-# 🧰 VARIABLES DE ENTORNO
+# PASAR A ROOT PARA INSTALAR DEPENDENCIAS
 # ============================================================
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    AIRFLOW_HOME=/opt/airflow
+USER root
 
-# ============================================================
-# 📦 DEPENDENCIAS DEL SISTEMA
-# ============================================================
+# 🔧 Dependencias necesarias para XGBoost, LightGBM y Scikit-Learn
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
+    gcc \
+    g++ \
     git \
+    cmake \
+    build-essential \
     libssl-dev \
     libffi-dev \
-    libpq-dev \
-    python3-dev \
-    libxml2-dev \
-    libxslt-dev \
-    rustc \
-    cargo \
+    libopenblas-dev \
+    libatlas-base-dev \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================================
-# 📂 CREAR DIRECTORIOS DE AIRFLOW Y PROYECTO
+# ESTRUCTURA DE DIRECTORIOS
 # ============================================================
-RUN mkdir -p /opt/airflow /opt/airflow/dags /opt/airflow/logs /opt/airflow/plugins /opt/airflow/project
-WORKDIR /opt/airflow/project
+RUN mkdir -p /opt/airflow/project && \
+    mkdir -p /opt/airflow/dags
+
+# Copiar DAGs de Airflow
+COPY airflow/dags/ /opt/airflow/dags/
+
+# Copiar TODO el proyecto Kedro al contenedor
+COPY . /opt/airflow/project/
+
+# Ajustar permisos (importante para Airflow)
+RUN chown -R airflow: /opt/airflow
 
 # ============================================================
-# 📋 COPIAR REQUERIMIENTOS SI EXISTE
+# VOLVER AL USUARIO airflow
 # ============================================================
-COPY requirements.txt ./
-
-# ============================================================
-# 🧠 INSTALAR LIBRERÍAS PYTHON (bloques separados para estabilidad)
-# ============================================================
-RUN pip install --upgrade pip setuptools wheel
-
-# --- Fijar numpy < 2 (evita incompatibilidades con PyArrow y sklearn) ---
-RUN pip install "numpy==1.26.4"
-
-# --- Airflow y Kedro base ---
-RUN pip install \
-    apache-airflow==2.9.3 \
-    kedro==0.19.12 \
-    kedro-viz==11.1.0 \
-    --no-cache-dir
-
-# --- Kedro Datasets completos ---
-RUN pip install \
-    kedro-datasets==1.8.0 \
-    kedro-datasets[pandas] \
-    kedro-datasets[parquet] \
-    kedro-datasets[excel] \
-    kedro-datasets[json] \
-    kedro-datasets[spark] \
-    kedro-datasets[sql] \
-    --no-cache-dir
-
-# --- DVC, ML y librerías científicas ---
-RUN pip install \
-    "dvc[all]" \
-    scikit-learn==1.5.2 \
-    xgboost \
-    lightgbm \
-    pandas==2.2.2 \
-    matplotlib \
-    seaborn \
-    joblib \
-    pyarrow==16.1.0 \
-    boto3 \
-    sqlalchemy \
-    openpyxl \
-    fastparquet \
-    --no-cache-dir
-
-# ============================================================
-# 👤 CREAR USUARIO AIRFLOW (no root)
-# ============================================================
-RUN useradd -ms /bin/bash airflow
 USER airflow
 
 # ============================================================
-# 🌀 COMANDO POR DEFECTO
+# INSTALAR DEPENDENCIAS (requirements.txt)
 # ============================================================
-CMD ["bash", "-c", "airflow db init && airflow webserver & airflow scheduler"]
+COPY requirements.txt /opt/airflow/requirements.txt
+
+# Evitar problemas de instalación
+RUN pip install --upgrade pip setuptools wheel
+
+# Instalar todo el ecosistema que usa tu proyecto
+RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
+
+# ============================================================
+# INICIALIZACIÓN AUTOMÁTICA (DB + USUARIO + SCHEDULER + WEBSERVER)
+# ============================================================
+CMD ["bash", "-c", "\
+    airflow db init && \
+    airflow users create \
+        --username admin \
+        --password 1234 \
+        --firstname Admin \
+        --lastname User \
+        --role Admin \
+        --email admin@example.com || true && \
+    airflow scheduler & \
+    airflow webserver \
+"]

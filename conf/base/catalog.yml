@@ -1,31 +1,46 @@
-# Here you can define all your datasets by using simple YAML syntax.
-# Documentation for this file format can be found in "The Data Catalog"
-# Link: https://docs.kedro.org/en/stable/data/data_catalog.html
+############################################################
+# RAW DATA (CSVs originales)
+############################################################
 
 intakes:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/Austin_Animal_Center_Intakes__10_01_2013_to_05_05_2025_.csv
   load_args:
     encoding: utf-8
 
 outcomes:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/Austin_Animal_Center_Outcomes__10_01_2013_to_05_05_2025_.csv
   load_args:
     encoding: utf-8
 
 licenses:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/01_raw/Seattle_Pet_Licenses.csv
   load_args:
     encoding: utf-8
-    
+
+############################################################
+# DATASET PROCESADO — MERGE INTAKES + OUTCOMES
+############################################################
+
+intakes_outcomes_merged:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/07_model_input/intakes_outcomes_merged.csv
+  save_args:
+    index: false
+
+############################################################
+# FEATURES (REGRESIÓN)
+############################################################
+
 features_dataset:
-  type: pandas.CSVDataset
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/04_feature/features_dataset.csv
 
-resultados_regresion:
-  type: MemoryDataset
+############################################################
+# REGRESIÓN — SPLIT
+############################################################
 
 X_train:
   type: MemoryDataset
@@ -35,38 +50,68 @@ y_train:
   type: MemoryDataset
 y_test:
   type: MemoryDataset
-regression_results:
+
+############################################################
+# REGRESIÓN — RESULTADOS
+############################################################
+
+resultados_regresion:
   type: MemoryDataset
 
-# Salidas intermedias clasificación
+############################################################
+# CLASIFICACIÓN — SALIDA DE preparar_datos_clasificacion
+############################################################
+
+X_clf:
+  type: MemoryDataset
+
+y_clf:
+  type: MemoryDataset
+
+############################################################
+# CLASIFICACIÓN — SPLIT
+############################################################
+
 X_train_clf:
   type: MemoryDataset
+
 X_test_clf:
   type: MemoryDataset
+
 y_train_clf:
   type: MemoryDataset
+
 y_test_clf:
   type: MemoryDataset
 
-# Resultados clasificación
+############################################################
+# CLASIFICACIÓN — RESULTADOS (CSV + artefactos en memoria)
+############################################################
+
 resultados_clasificacion:
-  type: pandas.CSVDataSet
+  type: kedro_datasets.pandas.CSVDataset
   filepath: data/08_reporting/resultados_clasificacion.csv
   save_args:
     index: false
 
-# Artefactos (dict con rutas/metadata)
 artefactos_clf:
   type: MemoryDataset
 
-intakes_outcomes_merged:
-  type: pandas.CSVDataset
-  filepath: data/07_model_input/intakes_outcomes_merged.csv
-  save_args:
-    index: False
+# ======================
+# PIPELINE NO SUPERVISADO
+# ======================
 
+X_scaled_unsup:
+  type: MemoryDataset
 
+unsup_columns:
+  type: MemoryDataset
 
+resultados_clustering:
+  type: MemoryDataset
 
+pca_2d:
+  type: MemoryDataset
 
-
+tsne_2d:
+  type: MemoryDataset

@@ -1,54 +1,26 @@
-# ============================================================
-# 🧠 GITIGNORE - Proyecto Kedro + Airflow + Docker + DVC
-# ============================================================
-
-# Ignorar todos los datos excepto archivos DVC
-data/**
+# === DATA ===
+data/*
 !data/**/*.dvc
 !data/**/.gitignore
-!data/.gitignore
 
-# ============================================================
-# 🔒 Entornos virtuales y dependencias
-# ============================================================
-venv/
-.env/
-.venv/
-env/
-ENV/
-
-# ============================================================
-# ⚙️ Archivos temporales y de caché
-# ============================================================
-*.log
-*.pyc
-*.pyo
-*.pyd
-__pycache__/
-.pytest_cache/
-.ipynb_checkpoints/
-
-# ============================================================
-# 📦 Archivos de configuración local y build
-# ============================================================
-conf/local/
-docs/build/
-build/
-dist/
-.cache/
-.DS_Store
-*.egg-info/
-
-# ============================================================
-# 🐳 Docker y Airflow
-# ============================================================
+# === AIRFLOW ===
 airflow/logs/
-airflow/plugins/__pycache__/
+airflow/config/
+airflow/plugins/
 airflow/__pycache__/
-*.pid
 
-# ============================================================
-# 🔁 DVC y outputs generados
-# ============================================================
+# === DVC ===
 .dvc/cache/
 .dvc/tmp/
+
+# === MODELS PESADOS ===
+07_model_output/*
+!07_model_output/*.dvc
+
+# === NOTEBOOK CHECKPOINTS ===
+.ipynb_checkpoints/
+
+# === DOCKER ===
+*.tar
+*.img
+__pycache__/

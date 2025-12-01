@@ -1,11 +1,13 @@
 stages:
-
   prepare_data:
     cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/prepare_data.py
     deps:
       - src/ricardo_ojeda_machine/pipelines/dvc_steps/prepare_data.py
-      - data/01_raw/intakes_outcomes_raw.csv
+      - data/01_raw
     outs:
+      - data/02_intermediate/intakes_transformed.csv
+      - data/02_intermediate/outcomes_transformed.csv
+      - data/02_intermediate/licenses_transformed.csv
       - data/02_intermediate/intakes_outcomes_clean.csv
 
   feature_engineering:
@@ -24,10 +26,30 @@ stages:
     outs:
       - 07_model_output/classification_results.csv
 
+  train_regression:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/train_regression.py
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/train_regression.py
+      - data/05_model_input/features_dataset.csv
+    outs:
+      - 07_model_output/regression_results.csv
+
+  pca_tsne:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/pca_tsne.py
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/pca_tsne.py
+      - data/05_model_input/features_dataset.csv
+    outs:
+      - 08_reporting/pca_tsne/pca_plot.png
+      - 08_reporting/pca_tsne/tsne_plot.png
+      - 08_reporting/pca_tsne/pca_2d.csv
+      - 08_reporting/pca_tsne/tsne_2d.csv
+
   evaluate:
     cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/evaluate.py
     deps:
       - src/ricardo_ojeda_machine/pipelines/dvc_steps/evaluate.py
       - 07_model_output/classification_results.csv
+      - 07_model_output/regression_results.csv
     outs:
       - 08_reporting/evaluation_summary.csv

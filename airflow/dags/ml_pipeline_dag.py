@@ -8,7 +8,7 @@ from airflow.operators.bash import BashOperator
 # Configuración base del DAG
 # ---------------------------
 default_args = {
-    "owner": "yasna",
+    "owner": "Ricardo",
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
@@ -32,7 +32,7 @@ ENV_EXPORT = (
 )
 
 with DAG(
-    dag_id="ml_bank_kedro_dvc_pipeline",
+    dag_id="mascotas_kedro_dvc_pipeline",
     default_args=default_args,
     description="Orquestación con Airflow de data_preparation -> regression -> classification (Kedro + DVC)",
     schedule_interval=SCHEDULE,
