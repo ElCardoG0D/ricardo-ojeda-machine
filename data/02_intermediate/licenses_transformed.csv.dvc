@@ -1,0 +1,5 @@
+outs:
+- md5: c4c0581d98309e0d9940fb0d8f741231
+  size: 3030587
+  hash: md5
+  path: licenses_transformed.csv

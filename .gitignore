@@ -2,10 +2,9 @@
 # 🧠 GITIGNORE - Proyecto Kedro + Airflow + Docker + DVC
 # ============================================================
 
-# Ignorar todos los datos por defecto
-data/*
-# Permitir los archivos de seguimiento DVC
-!data/*.dvc
+# Ignorar todos los datos excepto archivos DVC
+data/**
+!data/**/*.dvc
 !data/**/.gitignore
 !data/.gitignore
 

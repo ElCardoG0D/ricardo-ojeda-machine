@@ -1,26 +1,33 @@
 stages:
-  data_preparation:
-    cmd: python -m kedro run --pipeline=data_preparation
-    deps:
-      - src/ricardo_ojeda_machine/pipelines/data_preparation
-      - data/01_raw
-    outs:
-      - data/07_model_input
 
-  regression:
-    cmd: python -m kedro run --pipeline=regression
+  prepare_data:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/prepare_data.py
     deps:
-      - src/ricardo_ojeda_machine/pipelines/regression
-      - data/07_model_input
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/prepare_data.py
+      - data/01_raw/intakes_outcomes_raw.csv
     outs:
-      - data/08_reporting/resultados_regresion.csv
-      - data/08_reporting/comparativa_modelos_R2.png
+      - data/02_intermediate/intakes_outcomes_clean.csv
 
-  classification:
-    cmd: python -m kedro run --pipeline=classification
+  feature_engineering:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/feature_engineering.py
     deps:
-      - src/ricardo_ojeda_machine/pipelines/classification
-      - data/07_model_input
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/feature_engineering.py
+      - data/02_intermediate/intakes_outcomes_clean.csv
     outs:
-      - data/08_reporting/resultados_clasificacion.csv
-      - data/08_reporting/comparativa_modelos_clf.png
+      - data/05_model_input/features_dataset.csv
+
+  train_models:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/train_models.py
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/train_models.py
+      - data/05_model_input/features_dataset.csv
+    outs:
+      - 07_model_output/classification_results.csv
+
+  evaluate:
+    cmd: python src/ricardo_ojeda_machine/pipelines/dvc_steps/evaluate.py
+    deps:
+      - src/ricardo_ojeda_machine/pipelines/dvc_steps/evaluate.py
+      - 07_model_output/classification_results.csv
+    outs:
+      - 08_reporting/evaluation_summary.csv
